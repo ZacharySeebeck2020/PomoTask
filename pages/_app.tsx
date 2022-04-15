@@ -4,9 +4,9 @@ import '../styles/globals.scss'
 function MyApp({ Component, pageProps }) {
   return (
     <>
-      <section className="columns is-fullheight">
+      <section className="flex h-screen">
         <Sidenav/>
-        <div className="main-content section container column is-10">
+        <div className="bg-background w-full text-white">
           <Component {...pageProps} />
         </div>
       </section>

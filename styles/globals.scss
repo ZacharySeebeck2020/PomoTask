@@ -1,8 +1,9 @@
-@import "./variables";
-@import "../node_modules/bulma/bulma.sass";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300&display=swap');
 
-#sidenav {
-    height: 100vh;
-    position: sticky;
-    top: 0;
+body {
+    font-family: 'Inter', sans-serif;
 }
+
