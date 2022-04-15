@@ -1,32 +1,34 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRightToBracket, faClock, faGear, faTasks } from '@fortawesome/free-solid-svg-icons';
+import { useRouter } from "next/router";
 
 export default function Sidenav() {
+    const router = useRouter();
     return (
-        <aside className="w-64 h-full" aria-label="Sidebar">
-            <div className="overflow-y-auto py-4 px-3 bg-gray-50 dark:bg-gray-800 h-full flex flex-col">
+        <aside className="w-64 h-screen fixed left-0" aria-label="Sidebar">
+            <div className="overflow-y-auto py-4 px-3 bg-gray-800 h-full flex flex-col">
 
-                <a href="https://flowbite.com" className="flex items-center flex-col px-2.5 mb-5">
+                <span className="flex items-center flex-col px-2.5 mb-5">
                     <img src="icon.png" className="h-20" alt="Flowbite Logo" />
                     <span className="text-xl font-semibold whitespace-nowrap dark:text-white">Pomotask</span>
-                </a>
+                </span>
 
                 <ul className="space-y-5 mt-10">
                     <li>
-                        <a href="#" className="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <a onClick={() => {router.push('/')}} className="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
                             <FontAwesomeIcon icon={faClock} className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"/>
                             <span className="flex-1 ml-3 whitespace-nowrap">Timer</span>
                             <span className="inline-flex justify-center items-center p-3 ml-3 h-3 text-sm font-medium text-blue-600 bg-blue-200 rounded-full dark:bg-blue-900 dark:text-blue-200">23:54</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" className="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <a onClick={() => {router.push('/tasks')}} className="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
                             <FontAwesomeIcon icon={faTasks} className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"/>
                             <span className="flex-1 ml-3 whitespace-nowrap">Tasks</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" className="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <a onClick={() => {router.push('/settings')}} className="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
                             <FontAwesomeIcon icon={faGear} className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"/>
                             <span className="flex-1 ml-3 whitespace-nowrap">Settings</span>
                         </a>

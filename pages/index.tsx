@@ -1,5 +1,5 @@
 import { faFortAwesome } from '@fortawesome/free-brands-svg-icons';
-import { faCaretDown, faClockRotateLeft, faForward, faPause, faPlay } from '@fortawesome/free-solid-svg-icons';
+import { faCaretDown, faCheck, faClockRotateLeft, faForward, faPause, faPlay } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Head from 'next/head'
 import Image from 'next/image'
@@ -11,18 +11,18 @@ export default function Home() {
   return (
     <div className="w-full h-full flex flex-row justify-center">
       <div className="mx-auto flex justify-center items-center min-h-screen">
-        <div className="h-auto w-96 bg-white rounded-lg p-4">
+        <div className="h-auto w-96 bg-lightBlue rounded-lg p-4">
           <div className="mt-3 text-sm text-[#8ea6c8] flex justify-between items-center">
             <p className="set_date">Selected Project</p>
             <p className="set_time">Time Today Spent (00:00)</p>
           </div>
-          <p className="text-xl font-semibold mt-2 text-[#063c76]">Pomotask</p>
+          <p className="text-xl font-semibold mt-2 text-white">Pomotask</p>
           <ul className="my-4 h-[60vh] overflow-y-auto scrollbar pr-2">
             <li className=" mt-4" id="1">
               <div className="flex gap-2">
                 <div className="w-full h-12 bg-[#e0ebff] rounded-[7px] flex justify-start items-center px-3"> 
-                  <span id="check1" className=" w-7 h-7 bg-white rounded-full border border-white transition-all cursor-pointer hover:border-[#36d344] flex justify-center items-center" onclick="checked(1)">
-                    <i className="text-white fa fa-check"></i>
+                  <span id="check1" className="bg-green-300 w-7 h-7 bg-white rounded-full border border-white transition-all cursor-pointer hover:border-[#36d344] flex justify-center items-center" onclick="checked(1)">
+                    <FontAwesomeIcon className="text-white" icon={faCheck}/>
                   </span> 
                   <span className="line-through text-sm ml-4 text-[#5b7a9d] font-semibold">take out the trash</span> 
                 </div>
