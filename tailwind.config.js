@@ -1,3 +1,5 @@
+const colors = require('tailwindcss/colors');
+
 module.exports = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx}",
@@ -6,9 +8,17 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        background: 'rgb(17, 24, 39)'
+        ...colors,
+        background: 'rgb(17, 24, 39)',
+        lightBlue: 'rgb(6, 70, 99)'
       }
     },
   },
-  plugins: [],
+  plugins: [
+    require("daisyui"),
+    require("tailwind-scrollbar")
+  ],
+  variants: {
+    scrollbar: ['dark']
+  }
 }
