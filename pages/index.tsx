@@ -21,7 +21,7 @@ export default function Home() {
             <li className=" mt-4" id="1">
               <div className="flex gap-2">
                 <div className="w-full h-12 bg-[#e0ebff] rounded-[7px] flex justify-start items-center px-3"> 
-                  <span id="check1" className="bg-green-300 w-7 h-7 bg-white rounded-full border border-white transition-all cursor-pointer hover:border-[#36d344] flex justify-center items-center" onclick="checked(1)">
+                  <span id="check1" className="bg-green-300 w-7 h-7 bg-white rounded-full border border-white transition-all cursor-pointer hover:border-[#36d344] flex justify-center items-center">
                     <FontAwesomeIcon className="text-white" icon={faCheck}/>
                   </span> 
                   <span className="line-through text-sm ml-4 text-[#5b7a9d] font-semibold">take out the trash</span> 
