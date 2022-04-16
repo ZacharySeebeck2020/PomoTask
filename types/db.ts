@@ -1,17 +1,35 @@
 export interface Db {
     pomodoro: Pomodoro;
+    user: User;
+    projects: Array<Project>;
+    tasks: Array<Task>;
+
+    GetProjectTasks(projId: string): Array<Task>;
+    UpdateTask(taskId: string, task: Task): void;
+    UpdateProject(projId: string, project: Project): void;
+    CreateTask(projId: string, task: Partial<Task>): void;
+    CreateProject(project: Partial<Project>): void;
+    DeleteProject(project: Project): void;
+
+    PausePlayTimer(): void;
+    RunTimer(): void;
 }
 
-export interface User {
+export type User = {
 
 }
 
-export interface Projects {
-
+export type Project = {
+    id: string;
+    name: string;
+    timeSpent: number;
 }
 
-export interface Tasks {
-
+export type Task = {
+    id: string;
+    project: string;
+    completed: boolean;
+    value: string;
 }
 
 export type Pomodoro = {

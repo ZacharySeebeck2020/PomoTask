@@ -1,13 +1,57 @@
-import { faClockRotateLeft, faForward, faPlay } from "@fortawesome/free-solid-svg-icons";
+import { faClockRotateLeft, faForward, faPause, faPlay } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ProgressBar from "@ramonak/react-progress-bar";
+import { useDb } from "../../context/DbProvider";
+import { PomodoroStatus } from "../../types/db";
+import { FormatTime } from "../../util/time";
 export default function Footer() {
+    const {db, loading: dbLoading, refreshDb} = useDb();
+  
+    if (dbLoading) {
+      return <h1>Loading...</h1>
+    }
+
     return (
-        <footer className="inline-flex fixed bottom-0 dark:bg-gray-800 h-16" style={{width: 'calc(100vw - 17rem)'}}>
+        <footer className="inline-flex fixed bottom-0 dark:bg-gray-800 h-16" style={{width: 'calc(100vw - 4rem)'}}>
             <div className="w-5/6 my-auto">
                 <ProgressBar 
-                    completed={100} 
-                    customLabel="23:54 Remaining"
+                    completed={(() => {
+                        switch (db.pomodoro.currentStatus) {
+                          case PomodoroStatus.FOCUS:
+                              return db.pomodoro.workDuration - db.pomodoro.remainingTime;
+                            break;
+          
+                          case PomodoroStatus.SHORT_BREAK:
+                              return db.pomodoro.shortBreakDuration - db.pomodoro.remainingTime;
+                            break;
+          
+                          case PomodoroStatus.LONG_BREAK:
+                              return db.pomodoro.longBreakDuration - db.pomodoro.remainingTime;
+                            break;
+                        
+                          default:
+                            break;
+                        }
+                    })()}
+                    maxCompleted={(() => {
+                        switch (db.pomodoro.currentStatus) {
+                          case PomodoroStatus.FOCUS:
+                              return db.pomodoro.workDuration;
+                            break;
+          
+                          case PomodoroStatus.SHORT_BREAK:
+                              return db.pomodoro.shortBreakDuration;
+                            break;
+          
+                          case PomodoroStatus.LONG_BREAK:
+                              return db.pomodoro.longBreakDuration;
+                            break;
+                        
+                          default:
+                            break;
+                        }
+                    })()}
+                    customLabel={`${FormatTime(db.pomodoro.remainingTime)}`}
                     labelClassName="mr-4"
                     labelColor="rgb(4, 41, 58)"
                     bgColor="#ECB365"
@@ -15,10 +59,13 @@ export default function Footer() {
                 />
             </div>
             <div className="flex w-1/6 justify-between mx-8">
-                <span className="my-auto text-sm">1 of 4 sessions.</span>
+                <span className="my-auto text-sm text-center mx-auto">{db.pomodoro.currentSession} of {db.pomodoro.totalSessions} sessions.</span>
                 <div className="my-auto flex flex-row">
                     <span className="rounded-full border-2 my-auto border-white-100 py-1 px-2 mx-2 text-2xs"><FontAwesomeIcon icon={faClockRotateLeft} /></span>
-                    <span className="rounded-full border-2 border-lightBlue text-lightBlue py-2 px-3 mx-2 text-2xs"><FontAwesomeIcon icon={faPlay} /></span>
+                    <span onClick={() => {
+                        db.PausePlayTimer();
+                        refreshDb();
+                    }} className="rounded-full border-2 border-lightBlue text-lightBlue py-2 px-3 mx-2 text-2xs"><FontAwesomeIcon icon={db.pomodoro.isRunning ? faPause : faPlay} /></span>
                     <span className="rounded-full border-2 my-auto border-white-100 py-1 px-2 mx-2 text-2xs"><FontAwesomeIcon icon={faForward} /></span>
                 </div>
             </div>

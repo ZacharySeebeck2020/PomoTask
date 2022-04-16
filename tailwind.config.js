@@ -10,7 +10,8 @@ module.exports = {
       colors: {
         ...colors,
         background: 'rgb(17, 24, 39)',
-        lightBlue: 'rgb(6, 70, 99)'
+        lightBlue: 'rgb(6, 70, 99)',
+        navHiddenBack: 'rgba(6, 70, 99, 0.4)'
       }
     },
   },
@@ -19,6 +20,7 @@ module.exports = {
     require("tailwind-scrollbar")
   ],
   variants: {
+    visibility: ["group-hover"],
     scrollbar: ['dark']
   }
 }
