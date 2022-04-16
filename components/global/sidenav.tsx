@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRightToBracket, faBell, faClock, faGear, faTasks } from '@fortawesome/free-solid-svg-icons';
 import { useRouter } from "next/router";
 import { FormatTime } from "../../util/time";
-import Notifier from '../../util/notifications'
+import Notifier from '../../util/notifier'
 import { useDb } from "../../context/DbProvider";
 
 export default function Sidenav() {
@@ -56,12 +56,14 @@ export default function Sidenav() {
                     </div> */}
 
                     <ul className="space-y-2 mt-auto">
-                        <li>
-                            <a onClick={() => {Notifier.RequestPermission()}} className={`cursor-pointer flex items-center p-2 text-base font-normal text-gray-900 rounded-full group-hover:rounded-lg rounded-lg dark:text-white hover:bg-gray-700 ${router.pathname == '/auth' ? 'bg-gray-700' : ''}`}>
-                                <FontAwesomeIcon icon={faBell} className="mx-auto flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"/>
-                                <span className="flex-1 ml-3 whitespace-nowrap hidden group-hover:block">Enable Notifications</span>
-                            </a>
-                        </li>
+                        {!Notifier.HasPermission() ? (
+                            <li>
+                                <a onClick={() => {Notifier.RequestPermission()}} className={`cursor-pointer flex items-center p-2 text-base font-normal text-gray-900 rounded-full group-hover:rounded-lg rounded-lg dark:text-white hover:bg-gray-700 ${router.pathname == '/auth' ? 'bg-gray-700' : ''}`}>
+                                    <FontAwesomeIcon icon={faBell} className="mx-auto flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"/>
+                                    <span className="flex-1 ml-3 whitespace-nowrap hidden group-hover:block">Enable Notifications</span>
+                                </a>
+                            </li>
+                        ) : (<></>)}
                         <li>
                             <a onClick={() => {router.push('/auth')}} className={`cursor-pointer flex items-center p-2 text-base font-normal text-gray-900 rounded-full group-hover:rounded-lg rounded-lg dark:text-white hover:bg-gray-700 ${router.pathname == '/auth' ? 'bg-gray-700' : ''}`}>
                                 <FontAwesomeIcon icon={faArrowRightToBracket} className="mx-auto flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"/>

@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import RetrieveDb from '../lib/db';
 import { DbContextValues } from '../types/data';
 import { PomodoroStatus } from '../types/db';
-import Notifier from '../util/notifications'
+import Notifier from '../util/notifier'
 
 const DbContext = createContext<Partial<DbContextValues>>({});
 
