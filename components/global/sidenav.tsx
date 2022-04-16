@@ -64,12 +64,12 @@ export default function Sidenav() {
                                 </a>
                             </li>
                         ) : (<></>)}
-                        <li>
+                        {/* <li>
                             <a onClick={() => {router.push('/auth')}} className={`cursor-pointer flex items-center p-2 text-base font-normal text-gray-900 rounded-full group-hover:rounded-lg rounded-lg dark:text-white hover:bg-gray-700 ${router.pathname == '/auth' ? 'bg-gray-700' : ''}`}>
                                 <FontAwesomeIcon icon={faArrowRightToBracket} className="mx-auto flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"/>
                                 <span className="flex-1 ml-3 whitespace-nowrap hidden group-hover:block">Sign In</span>
                             </a>
-                        </li> 
+                        </li>  */}
                     </ul>
                 </div>
             </aside>
