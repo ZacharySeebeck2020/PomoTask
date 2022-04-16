@@ -3,20 +3,30 @@ import { faCaretDown, faCheck, faClockRotateLeft, faForward, faPause, faPlay } f
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Head from 'next/head'
 import Image from 'next/image'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CircularProgressbarWithChildren, buildStyles } from 'react-circular-progressbar'
 import 'react-circular-progressbar/dist/styles.css';
 import { useDb } from '../context/DbProvider';
 import styles from '../styles/Home.module.css'
 import { PomodoroStatus } from '../types/db';
-import { FormatTime } from '../util/time';
+import { BreakApartTime, CalculateProgress, FormatTime, GetSeconds } from '../util/time';
 
 export default function Home() {
   const {db, loading: dbLoading, refreshDb} = useDb();
-  const [activeProject, setActiveProject] = useState<number>(0);
 
   if (dbLoading) {
     return <h1>Loading...</h1>
+  }
+
+  useEffect(() => {
+    if (db.pomodoro.activeProject == -1) {
+      db.SetActiveProject(0);
+      refreshDb();
+    }
+  }, [db])
+
+  if (db.pomodoro.activeProject == -1) {
+    return (<></>);
   }
 
   return (
@@ -25,15 +35,15 @@ export default function Home() {
         <div className="h-auto w-96 bg-lightBlue rounded-lg p-4">
           <div className="mt-3 text-sm text-[#8ea6c8] flex justify-between items-center">
             <p className="set_date">Selected Project</p>
-            <p className="set_time">Time Spent Today: ({FormatTime(db.projects[activeProject].timeSpent)})</p>
+            <p className="set_time">Time Spent Today: ({FormatTime(db.projects[db.pomodoro.activeProject].timeSpent)})</p>
           </div>
-          <p className="text-xl font-semibold mt-2 text-white">{db.projects[activeProject].name}</p>
+          <p className="text-xl font-semibold mt-2 text-white">{db.projects[db.pomodoro.activeProject].name}</p>
           <ul className="my-4 h-[60vh] overflow-y-auto scrollbar pr-2">
             <li className=" mt-4" id="1">
               <div className="flex gap-2 flex-col-reverse">
-                {db.GetProjectTasks(db.projects[activeProject].id).map((task) => {
+                {db.GetProjectTasks(db.projects[db.pomodoro.activeProject].id).map((task) => {
                   return (
-                      <div key={`tasksProj${db.projects[activeProject].id}Task${task.id}`} className="w-full h-12 bg-[#e0ebff] rounded-[7px] flex justify-start items-center px-3">
+                      <div key={`tasksProj${db.projects[db.pomodoro.activeProject].id}Task${task.id}`} className="w-full h-12 bg-[#e0ebff] rounded-[7px] flex justify-start items-center px-3">
                           <span onClick={() => {
                               db.UpdateTask(task.id, {...task, completed: !task.completed});
                               refreshDb();
@@ -50,7 +60,7 @@ export default function Home() {
         </div>
       </div>
       <div className="ml-auto mx-auto w-50 h-full flex flex-col justify-center">
-        <select value={activeProject} disabled={db.pomodoro.isRunning} onChange={(event) => {setActiveProject(parseInt(event.target.value))}} className="select w-full max-w-xs mx-auto mb-5">
+        <select value={db.pomodoro.activeProject} disabled={db.pomodoro.isRunning} onChange={(event) => {db.SetActiveProject(parseInt(event.target.value)); refreshDb();}} className="select w-full max-w-xs mx-auto mb-5">
           {db.projects.map((project, idx) => {
             return (<option value={idx} key={`projectSelector${idx}`}>{project.name}</option>)
           })}
@@ -60,15 +70,15 @@ export default function Home() {
             value={(() => {
               switch (db.pomodoro.currentStatus) {
                 case PomodoroStatus.FOCUS:
-                    return db.pomodoro.workDuration - db.pomodoro.remainingTime;
+                    return CalculateProgress( BreakApartTime(db.pomodoro.workDuration), BreakApartTime(db.pomodoro.remainingTime) );
                   break;
 
                 case PomodoroStatus.SHORT_BREAK:
-                    return db.pomodoro.shortBreakDuration - db.pomodoro.remainingTime;
+                    return CalculateProgress( BreakApartTime(db.pomodoro.shortBreakDuration), BreakApartTime(db.pomodoro.remainingTime) );
                   break;
 
                 case PomodoroStatus.LONG_BREAK:
-                    return db.pomodoro.longBreakDuration - db.pomodoro.remainingTime;
+                    return CalculateProgress( BreakApartTime(db.pomodoro.longBreakDuration), BreakApartTime(db.pomodoro.remainingTime) );
                   break;
               
                 default:
@@ -78,15 +88,15 @@ export default function Home() {
             maxValue={(() => {
               switch (db.pomodoro.currentStatus) {
                 case PomodoroStatus.FOCUS:
-                    return db.pomodoro.workDuration;
+                    return GetSeconds(BreakApartTime(db.pomodoro.workDuration));
                   break;
 
                 case PomodoroStatus.SHORT_BREAK:
-                    return db.pomodoro.shortBreakDuration;
+                    return GetSeconds(BreakApartTime(db.pomodoro.shortBreakDuration));
                   break;
 
                 case PomodoroStatus.LONG_BREAK:
-                    return db.pomodoro.longBreakDuration;
+                    return GetSeconds(BreakApartTime(db.pomodoro.longBreakDuration));
                   break;
               
                 default:
@@ -105,7 +115,7 @@ export default function Home() {
           >
             <div className="flex flex-col text-center">
               <strong className="text-5xl">{FormatTime(db.pomodoro.remainingTime)}</strong>
-              <span className="text-2xl uppercase font-bold mt-5">Focus</span>
+              <span className="text-2xl uppercase font-bold mt-5">{db.pomodoro.currentStatus}</span>
             </div>
           </CircularProgressbarWithChildren >
         </div>

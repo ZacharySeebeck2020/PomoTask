@@ -1,7 +1,8 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRightToBracket, faClock, faGear, faTasks } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRightToBracket, faBell, faClock, faGear, faTasks } from '@fortawesome/free-solid-svg-icons';
 import { useRouter } from "next/router";
 import { FormatTime } from "../../util/time";
+import Notifier from '../../util/notifications'
 import { useDb } from "../../context/DbProvider";
 
 export default function Sidenav() {
@@ -42,7 +43,7 @@ export default function Sidenav() {
                         </li>
                     </ul>
 
-                    {/* <div id="dropdown-cta" className="p-4 mt-6 bg-blue-50 rounded-lg dark:bg-blue-900 mt-auto mb-8" role="alert">
+                    {/* <div id="dropdown-cta" className="hidden group-hover:block p-4 mt-6 bg-blue-50 rounded-lg dark:bg-blue-900 mt-auto mb-8 flex flex-col" role="alert">
                         <div className="flex items-center mb-3">
                             <button type="button" className="ml-auto -mx-1.5 -my-1.5 bg-blue-50 text-blue-900 rounded-lg focus:ring-2 focus:ring-blue-400 p-1 hover:bg-blue-200 inline-flex h-6 w-6 dark:bg-blue-900 dark:text-blue-400 dark:hover:bg-blue-800" data-collapse-toggle="dropdown-cta" aria-label="Close">
                                 <span className="sr-only">Close</span>
@@ -50,11 +51,17 @@ export default function Sidenav() {
                             </button>
                         </div>
                         <p className="mb-3 text-sm text-blue-900 dark:text-blue-400">
-                            Preview the new Flowbite dashboard navigation! You can turn the new navigation off for a limited time in your profile.
+                            Enable notifications for break reminders!
                         </p>
                     </div> */}
 
                     <ul className="space-y-2 mt-auto">
+                        <li>
+                            <a onClick={() => {Notifier.RequestPermission()}} className={`cursor-pointer flex items-center p-2 text-base font-normal text-gray-900 rounded-full group-hover:rounded-lg rounded-lg dark:text-white hover:bg-gray-700 ${router.pathname == '/auth' ? 'bg-gray-700' : ''}`}>
+                                <FontAwesomeIcon icon={faBell} className="mx-auto flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"/>
+                                <span className="flex-1 ml-3 whitespace-nowrap hidden group-hover:block">Enable Notifications</span>
+                            </a>
+                        </li>
                         <li>
                             <a onClick={() => {router.push('/auth')}} className={`cursor-pointer flex items-center p-2 text-base font-normal text-gray-900 rounded-full group-hover:rounded-lg rounded-lg dark:text-white hover:bg-gray-700 ${router.pathname == '/auth' ? 'bg-gray-700' : ''}`}>
                                 <FontAwesomeIcon icon={faArrowRightToBracket} className="mx-auto flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"/>

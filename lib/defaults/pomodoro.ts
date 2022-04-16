@@ -1,14 +1,15 @@
 import { Pomodoro, PomodoroStatus } from "../../types/db";
 
 const PomodoroDefault: Pomodoro = {
-    remainingTime: 25 * 60,
+    remainingTime: '00:00:00:11',
     currentStatus: PomodoroStatus.FOCUS,
     currentSession: 1,
     totalSessions: 4,
-    workDuration: 25 * 60,
-    shortBreakDuration: 5 * 60,
-    longBreakDuration: 20 * 60,
-    isRunning: false
+    workDuration: '00:00:00:11',
+    shortBreakDuration: '00:00:00:12',
+    longBreakDuration: '00:00:00:10',
+    isRunning: false,
+    activeProject: 0
 }
 
 export default PomodoroDefault;

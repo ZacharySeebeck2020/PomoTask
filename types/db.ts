@@ -4,6 +4,8 @@ export interface Db {
     projects: Array<Project>;
     tasks: Array<Task>;
 
+    UpdatePomodoro(pomodoro: Pomodoro): void;
+
     GetProjectTasks(projId: string): Array<Task>;
     UpdateTask(taskId: string, task: Task): void;
     UpdateProject(projId: string, project: Project): void;
@@ -13,6 +15,8 @@ export interface Db {
 
     PausePlayTimer(): void;
     RunTimer(): void;
+
+    SetActiveProject(idx: number): void;
 }
 
 export type User = {
@@ -22,7 +26,7 @@ export type User = {
 export type Project = {
     id: string;
     name: string;
-    timeSpent: number;
+    timeSpent: string;
 }
 
 export type Task = {
@@ -33,18 +37,19 @@ export type Task = {
 }
 
 export type Pomodoro = {
-    remainingTime: number;
+    remainingTime: string;
     currentStatus: PomodoroStatus;
     currentSession: number;
     totalSessions: number;
-    workDuration: number;
-    shortBreakDuration: number;
-    longBreakDuration: number;
+    workDuration: string;
+    shortBreakDuration: string;
+    longBreakDuration: string;
     isRunning: boolean;
+    activeProject: number;
 }
 
 export enum PomodoroStatus {
-    FOCUS,
-    SHORT_BREAK,
-    LONG_BREAK
+    FOCUS = "FOCUS",
+    SHORT_BREAK = "SHORT BREAK",
+    LONG_BREAK = "LONG BREAK"
 }

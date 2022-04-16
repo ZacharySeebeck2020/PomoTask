@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ProgressBar from "@ramonak/react-progress-bar";
 import { useDb } from "../../context/DbProvider";
 import { PomodoroStatus } from "../../types/db";
-import { FormatTime } from "../../util/time";
+import { BreakApartTime, CalculateProgress, FormatTime, GetSeconds } from "../../util/time";
 export default function Footer() {
     const {db, loading: dbLoading, refreshDb} = useDb();
   
@@ -16,40 +16,40 @@ export default function Footer() {
             <div className="w-5/6 my-auto">
                 <ProgressBar 
                     completed={(() => {
-                        switch (db.pomodoro.currentStatus) {
-                          case PomodoroStatus.FOCUS:
-                              return db.pomodoro.workDuration - db.pomodoro.remainingTime;
-                            break;
-          
-                          case PomodoroStatus.SHORT_BREAK:
-                              return db.pomodoro.shortBreakDuration - db.pomodoro.remainingTime;
-                            break;
-          
-                          case PomodoroStatus.LONG_BREAK:
-                              return db.pomodoro.longBreakDuration - db.pomodoro.remainingTime;
-                            break;
-                        
-                          default:
-                            break;
-                        }
+                      switch (db.pomodoro.currentStatus) {
+                        case PomodoroStatus.FOCUS:
+                            return CalculateProgress( BreakApartTime(db.pomodoro.workDuration), BreakApartTime(db.pomodoro.remainingTime) );
+                          break;
+        
+                        case PomodoroStatus.SHORT_BREAK:
+                            return CalculateProgress( BreakApartTime(db.pomodoro.shortBreakDuration), BreakApartTime(db.pomodoro.remainingTime) );
+                          break;
+        
+                        case PomodoroStatus.LONG_BREAK:
+                            return CalculateProgress( BreakApartTime(db.pomodoro.longBreakDuration), BreakApartTime(db.pomodoro.remainingTime) );
+                          break;
+                      
+                        default:
+                          break;
+                      }
                     })()}
                     maxCompleted={(() => {
-                        switch (db.pomodoro.currentStatus) {
-                          case PomodoroStatus.FOCUS:
-                              return db.pomodoro.workDuration;
-                            break;
-          
-                          case PomodoroStatus.SHORT_BREAK:
-                              return db.pomodoro.shortBreakDuration;
-                            break;
-          
-                          case PomodoroStatus.LONG_BREAK:
-                              return db.pomodoro.longBreakDuration;
-                            break;
-                        
-                          default:
-                            break;
-                        }
+                      switch (db.pomodoro.currentStatus) {
+                        case PomodoroStatus.FOCUS:
+                            return GetSeconds(BreakApartTime(db.pomodoro.workDuration));
+                          break;
+        
+                        case PomodoroStatus.SHORT_BREAK:
+                            return GetSeconds(BreakApartTime(db.pomodoro.shortBreakDuration));
+                          break;
+        
+                        case PomodoroStatus.LONG_BREAK:
+                            return GetSeconds(BreakApartTime(db.pomodoro.longBreakDuration));
+                          break;
+                      
+                        default:
+                          break;
+                      }
                     })()}
                     customLabel={`${FormatTime(db.pomodoro.remainingTime)}`}
                     labelClassName="mr-4"

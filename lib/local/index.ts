@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Db, Pomodoro, Project, Task, User } from "../../types/db";
+import { Db, Pomodoro, PomodoroStatus, Project, Task, User } from "../../types/db";
+import { BreakApartTime, IncreaseByTime, SubtractByTime, TimeToString } from '../../util/time';
 import PomodoroDefault from "../defaults/pomodoro";
 import ProjectDefault from "../defaults/project";
 import TaskDefault from "../defaults/task";
@@ -50,6 +51,11 @@ export default class LocalStorageDb implements Db {
         this._user = user;
     }
 
+    UpdatePomodoro(pomodoro: Pomodoro): void {
+        this._pomodoro = pomodoro;
+        localStorage.setItem('pomodoro', JSON.stringify(this._pomodoro));
+    }
+
     GetProjectTasks(projId: string) {
         return this._tasks.filter((task) => {
             return task.project == projId;
@@ -96,7 +102,7 @@ export default class LocalStorageDb implements Db {
         this._projects.push({
             id: uuidv4(),
             name: project.name,
-            timeSpent: 0
+            timeSpent: '00:00:00:00'
         });
         localStorage.setItem('projects', JSON.stringify(this._projects))
     }
@@ -116,8 +122,40 @@ export default class LocalStorageDb implements Db {
     }
 
     RunTimer(): void {
-        this._pomodoro.remainingTime -= 1;
+        // Subtract second from timer.
+        let brokenTime = BreakApartTime(this._pomodoro.remainingTime);
+        brokenTime = SubtractByTime(
+            brokenTime,
+            {
+                days: 0,
+                hours: 0,
+                minutes: 0,
+                seconds: 1
+            }
+        );
+        this._pomodoro.remainingTime = TimeToString(brokenTime);
         localStorage.setItem('pomodoro', JSON.stringify(this._pomodoro));
+
+        if (this._pomodoro.currentStatus != PomodoroStatus.FOCUS) return;
+
+        // Add second to project time.
+        brokenTime = BreakApartTime(this._projects[this._pomodoro.activeProject].timeSpent);
+        brokenTime = IncreaseByTime(
+            brokenTime,
+            {
+                days: 0,
+                hours: 0,
+                minutes: 0,
+                seconds: 1
+            }
+        );
+        this._projects[this._pomodoro.activeProject].timeSpent = TimeToString(brokenTime);
+        localStorage.setItem('projects', JSON.stringify(this._projects));
+
     }
 
+    SetActiveProject(idx: number): void {
+        this._pomodoro.activeProject = idx;
+        localStorage.setItem('pomodoro', JSON.stringify(this._pomodoro));
+    }
 }

@@ -5,16 +5,15 @@ import { useDb } from "../../context/DbProvider";
 
 export default function Index() {
     const {db, loading: dbLoading, refreshDb} = useDb();
-    const [activeProject, setActiveProject] = useState<number>(0);
     const [newTaskString, setNewTaskString] = useState<string>('');
     const [projectTitle, setProjectTitle] = useState<string>('');
     const [isEditingProject, setIsEditingProject] = useState<boolean>(false);
 
     useEffect(() => {
         if (!dbLoading) {
-            setProjectTitle(activeProject == -1 ? '' : db.projects[activeProject].name);
+            setProjectTitle(db.pomodoro.activeProject == -1 ? '' : db.projects[db.pomodoro.activeProject].name);
         }
-    }, [db, dbLoading, activeProject])
+    }, [db, dbLoading])
 
     if (dbLoading) {
         return <h1>Loading...</h1>
@@ -29,22 +28,23 @@ export default function Index() {
                             <li key={`projSelector${idx}`} className="mr-2">
                                 <a href="#" className={
                                     'inline-block p-4 rounded-t-lg border-b-2 ' +
-                                    (activeProject == idx ? 
+                                    (db.pomodoro.activeProject == idx ? 
                                         'text-blue-500 border-blue-500' :
                                         'border-transparent hover:text-gray-600 hover:text-gray-300'
                                     )
-                                } onClick={() => {setActiveProject(idx); refreshDb();}} aria-current="page">{project.name}</a>
+                                } onClick={() => {db.SetActiveProject(idx); refreshDb();}} aria-current="page">{project.name}</a>
                             </li>
                         );
                     })}
 
                     <li className="ml-auto">
                         <a href="#" onClick={() => {
-                            setActiveProject(-1);
+                            db.SetActiveProject(-1);
+                            refreshDb();
                             setIsEditingProject(true);
                         }} className={
                             'inline-block p-4 rounded-t-lg border-b-2 ' +
-                            (activeProject == -1 ? 
+                            (db.pomodoro.activeProject == -1 ? 
                                 'text-blue-500 border-blue-500' :
                                 'border-transparent hover:text-gray-600 hover:text-gray-300'
                             )
@@ -62,23 +62,23 @@ export default function Index() {
                                 alert('Must have project title!');
                                 return;
                             } 
-                            if (activeProject != -1) {
-                                db.UpdateProject(db.projects[activeProject].id, {...db.projects[activeProject], name: projectTitle});
+                            if (db.pomodoro.activeProject != -1) {
+                                db.UpdateProject(db.projects[db.pomodoro.activeProject].id, {...db.projects[db.pomodoro.activeProject], name: projectTitle});
                                 refreshDb();
                                 setIsEditingProject(false);
                             } else {
                                 db.CreateProject({name: projectTitle});
                                 refreshDb();
-                                setActiveProject(db.projects.length - 1);
+                                db.SetActiveProject(db.projects.length - 1);
                                 refreshDb();
                                 setIsEditingProject(false);
                             }
                         }}>Save</button>
                         <button className="btn btn-error ml-4" onClick={() => {
-                            if (activeProject != -1) {
+                            if (db.pomodoro.activeProject != -1) {
                                 setIsEditingProject(false);
                             } else {
-                                setActiveProject(0);
+                                db.SetActiveProject(0);
                                 refreshDb();
                                 setIsEditingProject(false);
                             }
@@ -93,15 +93,15 @@ export default function Index() {
                                 return;
                             }
 
-                            db.DeleteProject(db.projects[activeProject])
+                            db.DeleteProject(db.projects[db.pomodoro.activeProject])
+                            db.SetActiveProject(0);
                             refreshDb();
-                            setActiveProject(0);
                             setIsEditingProject(false);
                         }} />
                     </div>
                 ) : (
                     <h2 className="text-xl flex flex-row">
-                        <FontAwesomeIcon className="text-sm my-auto mr-4 cursor-pointer" icon={faPencil} onClick={() => {setIsEditingProject(true)}} /> {db.projects[activeProject].name}
+                        <FontAwesomeIcon className="text-sm my-auto mr-4 cursor-pointer" icon={faPencil} onClick={() => {setIsEditingProject(true)}} /> {db.projects[db.pomodoro.activeProject].name}
                     </h2>
                 )}
             </div>
@@ -117,7 +117,7 @@ export default function Index() {
                                         <input value={newTaskString} onChange={(event) => {setNewTaskString(event.target.value)}} className="input h-10 text-white w-full mr-6" placeholder="Add New Task"></input>
                                         <span 
                                             onClick={() => {
-                                                db.CreateTask(db.projects[activeProject].id, {
+                                                db.CreateTask(db.projects[db.pomodoro.activeProject].id, {
                                                     value: newTaskString
                                                 });
                                                 refreshDb();
@@ -133,9 +133,9 @@ export default function Index() {
                             </li>
                             <li className="mt-4" id="1">
                                 <div className="flex gap-2 flex-col-reverse">
-                                        {activeProject != -1 ? db.GetProjectTasks(db.projects[activeProject].id).map((task) => {
+                                        {db.pomodoro.activeProject != -1 ? db.GetProjectTasks(db.projects[db.pomodoro.activeProject].id).map((task) => {
                                             return (
-                                                <div key={`tasksProj${db.projects[activeProject].id}Task${task.id}`} className="w-full h-12 bg-[#e0ebff] rounded-[7px] flex justify-start items-center px-3">
+                                                <div key={`tasksProj${db.projects[db.pomodoro.activeProject].id}Task${task.id}`} className="w-full h-12 bg-[#e0ebff] rounded-[7px] flex justify-start items-center px-3">
                                                     <span onClick={() => {
                                                         db.UpdateTask(task.id, {...task, completed: !task.completed});
                                                         refreshDb();
