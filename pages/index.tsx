@@ -14,16 +14,18 @@ import { BreakApartTime, CalculateProgress, FormatTime, GetSeconds } from '../ut
 export default function Home() {
   const {db, loading: dbLoading, refreshDb} = useDb();
 
-  if (dbLoading) {
-    return <h1>Loading...</h1>
-  }
-
   useEffect(() => {
+    if (dbLoading) return;
+    
     if (db.pomodoro.activeProject == -1) {
       db.SetActiveProject(0);
       refreshDb();
     }
-  }, [db])
+  }, [db, refreshDb, dbLoading])
+
+  if (dbLoading) {
+    return <h1>Loading...</h1>
+  }
 
   if (db.pomodoro.activeProject == -1) {
     return (<></>);

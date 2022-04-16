@@ -14,7 +14,7 @@ export default function Index() {
         if (!dbLoading) {
             setProjectTitle(activeProject == -1 ? '' : db.projects[activeProject].name);
         }
-    }, [activeProject])
+    }, [activeProject, db, dbLoading])
 
     if (dbLoading) {
         return <h1>Loading...</h1>

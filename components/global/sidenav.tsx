@@ -18,7 +18,7 @@ export default function Sidenav() {
             <aside className="z-50 w-16 hover:w-64 h-screen fixed left-0 transition-all" aria-label="Sidebar">
                 <div className="overflow-y-auto py-4 px-3 bg-gray-800 h-full flex flex-col">
                     <span className="flex items-center flex-col px-2.5 mb-5">
-                        <img src="icon.png" className="h-5 group-hover:h-20" alt="Flowbite Logo" />
+                        <img src="/icon.png" className="h-5 group-hover:h-20" alt="Flowbite Logo" />
                         <span className="invisible group-hover:visible text-xl font-semibold whitespace-nowrap dark:text-white">Pomotask</span>
                     </span>
 
