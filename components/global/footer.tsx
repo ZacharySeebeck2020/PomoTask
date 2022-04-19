@@ -12,8 +12,8 @@ export default function Footer() {
     }
 
     return (
-        <footer className="inline-flex fixed bottom-0 dark:bg-gray-800 h-16" style={{width: 'calc(100vw - 4rem)'}}>
-            <div className="w-5/6 my-auto">
+        <footer className="inline-flex flex-col lg:flex-row bottom-0 right-0 left-0 fixed bottom-0 md:left-[4em] dark:bg-gray-800 h-20 lg:h-16">
+            <div className="lg:w-4/6 my-auto px-16">
                 <ProgressBar 
                     completed={(() => {
                       switch (db.pomodoro.currentStatus) {
@@ -51,16 +51,14 @@ export default function Footer() {
                           break;
                       }
                     })()}
-                    customLabel={`${FormatTime(db.pomodoro.remainingTime)}`}
-                    labelClassName="mr-4"
-                    labelColor="rgb(4, 41, 58)"
+                    labelClassName="hidden"
                     bgColor="#ECB365"
                     baseBgColor='#04293A'
                 />
             </div>
-            <div className="flex w-1/6 justify-between mx-8">
-                <span className="my-auto text-sm text-center mx-auto">{db.pomodoro.currentSession} of {db.pomodoro.totalSessions} sessions.</span>
-                <div className="my-auto flex flex-row">
+            <div className="flex lg:w-2/6 justify-end lg:mx-auto lg:justify-between my-auto mx-16">
+                <span className="my-auto text-sm text-center mr-auto lg:ml-auto">{db.pomodoro.currentSession} of {db.pomodoro.totalSessions} sessions.</span>
+                <div className="my-auto flex flex-row ml-auto lg:mr-auto">
                     <span className="rounded-full border-2 my-auto border-white-100 py-1 px-2 mx-2 text-2xs"><FontAwesomeIcon icon={faClockRotateLeft} /></span>
                     <span onClick={() => {
                         db.PausePlayTimer();

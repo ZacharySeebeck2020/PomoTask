@@ -32,8 +32,8 @@ export default function Home() {
   }
 
   return (
-    <div className="w-full h-full flex flex-row justify-center">
-      <div className="mx-auto flex justify-center items-center min-h-screen">
+    <div className="w-full h-full flex flex-col sm:flex-row justify-center">
+      <div className="hidden md:flex mx-auto justify-center items-center min-h-screen">
         <div className="h-auto w-96 bg-lightBlue rounded-lg p-4">
           <div className="mt-3 text-sm text-[#8ea6c8] flex justify-between items-center">
             <p className="set_date">Selected Project</p>
@@ -61,7 +61,7 @@ export default function Home() {
           </ul>
         </div>
       </div>
-      <div className="ml-auto mx-auto w-50 h-full flex flex-col justify-center">
+      <div className="ml-auto mx-auto h-full flex flex-col justify-center">
         <select value={db.pomodoro.activeProject} disabled={db.pomodoro.isRunning} onChange={(event) => {db.SetActiveProject(parseInt(event.target.value)); refreshDb();}} className="select w-full max-w-xs mx-auto mb-5">
           {db.projects.map((project, idx) => {
             return (<option value={idx} key={`projectSelector${idx}`}>{project.name}</option>)

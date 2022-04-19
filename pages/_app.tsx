@@ -17,9 +17,9 @@ function MyApp({ Component, pageProps }) {
   return (
     <>
       <DbProvider>
-        <section className={router.pathname != '/' ? 'flex min-h-screen ml-16' : 'flex min-h-screen ml-16 '}>
+        <section className={'flex min-h-screen md:ml-16'}>
           <Sidenav />
-          <div className="z-30 bg-background w-full text-white">
+          <div className="z-30 bg-background w-full text-white mt-16 md:mt-0">
             <Component {...pageProps} />
             {router.pathname != '/' ? <Footer /> : ''}
           </div>

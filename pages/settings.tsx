@@ -37,7 +37,7 @@ export default function Settings() {
     }
 
     return (
-        <div className="w-3/6 mx-auto h-full flex flex-col justify-center">
+        <div className="w-3/6 mx-auto h-full flex flex-col -mt-16 justify-center mb-16">
             <div>
                 <label className="label">
                     <span className="label-text">Work Duration</span>

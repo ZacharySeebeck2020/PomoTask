@@ -54,7 +54,7 @@ export default function Index() {
                 </ul>
             </div>
 
-            <div className="flex flex-row mb-4 mx-16">
+            <div className="flex flex-row mb-4 mx-4 md:mx-16">
                 {isEditingProject ? (
                     <div className="w-full flex flex-row">
                         <input value={projectTitle} onChange={(event) => {setProjectTitle(event.target.value)}} className="input w-full mr-4"/>
@@ -107,8 +107,8 @@ export default function Index() {
                 )}
             </div>
 
-            <div className={`flex flex-row mx-16 ${isEditingProject ? 'opacity-50 select-none pointer-events-none' : ''}`}> {/* opacity-50 select-none pointer-events-none : For editing title */}
-                <div className="mx-auto flex justify-center items-center w-2/6">
+            <div className={`flex flex-row mx-4 md:mx-16 ${isEditingProject ? 'opacity-50 select-none pointer-events-none' : ''}`}> {/* opacity-50 select-none pointer-events-none : For editing title */}
+                <div className="mx-auto flex justify-center items-center w-full md:w-2/6 mb-32">
                     <div className="h-auto w-96 bg-lightBlue rounded-lg p-4">
                         <p className="text-xl font-semibold mt-2 text-white">Tasks</p>
                         <ul className="my-4 h-[60vh] overflow-y-auto scrollbar pr-2">
