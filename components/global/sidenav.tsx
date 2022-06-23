@@ -12,10 +12,10 @@ export default function Sidenav() {
     const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
     const {loading: dbLoading} = useDb();
-    
-    console.log(session);
 
-    if (dbLoading || status == 'loading') return (<>.</>);
+    
+
+    if (dbLoading || status == 'loading' || status == 'unauthenticated') return (<></>);
 
     return (
         <>

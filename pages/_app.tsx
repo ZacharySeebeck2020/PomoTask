@@ -7,7 +7,7 @@ import '../styles/globals.scss'
 import Head from 'next/head';
 import { config } from '@fortawesome/fontawesome-svg-core'
 import '@fortawesome/fontawesome-svg-core/styles.css'
-import { SessionProvider } from 'next-auth/react';
+import { getSession, SessionProvider } from 'next-auth/react';
 config.autoAddCss = false
 
 function MyApp({ Component, pageProps: { session, ...pageProps} }) {
@@ -46,16 +46,17 @@ function MyApp({ Component, pageProps: { session, ...pageProps} }) {
         <meta property='og:image' content='https://pomo.zacharyseebeck.com/icons/icon-192x192.png' />
       </Head>
       <DbProvider>
-        <section className={'flex min-h-screen md:ml-16'}>
+        <section className={`flex min-h-screen ${router.pathname != '/login' ? 'md:ml-16' : ''}`}>
           <Sidenav />
           <div className="z-30 bg-background w-full text-white mt-16 md:mt-0">
             <Component {...pageProps} />
-            {router.pathname != '/' ? <Footer /> : ''}
+            {router.pathname != '/' && router.pathname != '/login' ? <Footer /> : ''}
           </div>
         </section>
       </DbProvider>
     </SessionProvider>
   )
 }
+
 
 export default MyApp

@@ -1,5 +1,6 @@
 import { faCheck, faPencil, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { getSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useDb } from "../../context/DbProvider";
 
@@ -125,7 +126,7 @@ export default function Index() {
                                                 setNewTaskString('');
                                             }} 
                                             id="check1" 
-                                            className="ml-auto bg-green-500 w-9 h-7 bg-white rounded-full border border-white transition-all cursor-pointer hover:border-[#36d344] flex justify-center items-center"
+                                            className="ml-auto bg-green-500 w-9 h-7 rounded-full border border-white transition-all cursor-pointer hover:border-[#36d344] flex justify-center items-center"
                                         >
                                             <FontAwesomeIcon className="text-white" icon={faPlus} />
                                         </span>
@@ -140,7 +141,7 @@ export default function Index() {
                                                     <span onClick={() => {
                                                         db.UpdateTask(task.id, {...task, completed: !task.completed});
                                                         refreshDb();
-                                                    }} className={`${task.completed ? 'bg-green-500' : '' } w-7 h-7 bg-white rounded-full border border-white transition-all cursor-pointer hover:border-[#36d344] flex justify-center items-center`}>
+                                                    }} className={`${task.completed ? 'bg-green-500' : 'bg-white' } w-7 h-7 rounded-full border border-white transition-all cursor-pointer hover:border-[#36d344] flex justify-center items-center`}>
                                                         <FontAwesomeIcon className="text-white" icon={faCheck} />
                                                     </span>
                                                     <span className={`${task.completed ? 'line-through' : '' } text-sm ml-4 text-[#5b7a9d] font-semibold`}>{task.value}</span>
@@ -162,4 +163,23 @@ export default function Index() {
 
         </div>
     )
+}
+
+export async function getServerSideProps(context) {
+  const session = await getSession(context);
+
+  console.log('session', session);
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      }
+    };
+  }
+
+  return {
+    props: {}
+  }
 }

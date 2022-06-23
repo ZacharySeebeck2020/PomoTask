@@ -1,4 +1,5 @@
 import { doesNotMatch } from "assert";
+import { getSession } from "next-auth/react";
 import { useDb } from "../context/DbProvider";
 import { Pomodoro, PomodoroStatus } from "../types/db";
 import { BreakApartTime } from "../util/time";
@@ -119,4 +120,21 @@ export default function Settings() {
             </div>
         </div>
     )
+}
+
+export async function getServerSideProps(context) {
+  const session = await getSession(context);
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      }
+    };
+  }
+
+  return {
+    props: {}
+  }
 }

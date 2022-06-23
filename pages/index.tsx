@@ -1,6 +1,7 @@
 import { faFortAwesome } from '@fortawesome/free-brands-svg-icons';
 import { faCaretDown, faCheck, faClockRotateLeft, faForward, faPause, faPlay } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { getSession } from 'next-auth/react';
 import Head from 'next/head'
 import Image from 'next/image'
 import { useEffect, useState } from 'react';
@@ -9,12 +10,13 @@ import 'react-circular-progressbar/dist/styles.css';
 import { useDb } from '../context/DbProvider';
 import styles from '../styles/Home.module.css'
 import { PomodoroStatus } from '../types/db';
-import { BreakApartTime, CalculateProgress, FormatTime, GetSeconds } from '../util/time';
+import { BreakApartTime, CalculateProgress, FormatTime, GetSeconds } from '../util/time'
 
-export default function Home() {
+import prisma from '../lib/prisma';
+import { Session } from 'next-auth';
+
+export default function Home({ user, session }) {
   const {db, loading: dbLoading, refreshDb} = useDb();
-
-  console.log(db);
 
   useEffect(() => {
     if (dbLoading) return;
@@ -51,7 +53,7 @@ export default function Home() {
                           <span onClick={() => {
                               db.UpdateTask(task.id, {...task, completed: !task.completed});
                               refreshDb();
-                          }} className={`${task.completed ? 'bg-green-500' : '' } w-7 h-7 bg-white rounded-full border border-white transition-all cursor-pointer hover:border-[#36d344] flex justify-center items-center`}>
+                          }} className={`${task.completed ? 'bg-green-500' : 'bg-white' } w-7 h-7 rounded-full border border-white transition-all cursor-pointer hover:border-[#36d344] flex justify-center items-center`}>
                               <FontAwesomeIcon className="text-white" icon={faCheck} />
                           </span>
                           <span className={`${task.completed ? 'line-through' : '' } text-sm ml-4 text-[#5b7a9d] font-semibold`}>{task.value}</span>
@@ -138,4 +140,35 @@ export default function Home() {
       </div>
     </div>
   )
+}
+
+export async function getServerSideProps(context) {
+  const session: Session = await getSession(context);
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      }
+    };
+  }
+  
+  
+  const user = await prisma.user.findFirst({
+    where: {
+      id: session.user.id
+    },
+    include: {
+      projects: true,
+      pomodoro: true
+    }
+  });
+
+  return {
+    props: {
+      user: user,
+      session: session,
+    }
+  }
 }

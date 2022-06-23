@@ -9,7 +9,6 @@ const PomodoroDefault: Pomodoro = {
     shortBreakDuration: '00:00:05:00',
     longBreakDuration: '00:00:20:00',
     isRunning: false,
-    activeProject: 0
 }
 
 export default PomodoroDefault;

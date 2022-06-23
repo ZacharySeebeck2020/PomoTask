@@ -30,8 +30,8 @@ export type Project = {
 }
 
 export type Task = {
-    id: string;
-    project: string;
+    id?: string
+    projectId?: string;
     completed: boolean;
     value: string;
 }
@@ -45,7 +45,7 @@ export type Pomodoro = {
     shortBreakDuration: string;
     longBreakDuration: string;
     isRunning: boolean;
-    activeProject: number;
+    activeProject?: number;
 }
 
 export enum PomodoroStatus {
