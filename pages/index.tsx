@@ -17,7 +17,7 @@ import { Session } from 'next-auth';
 
 export default function Home({ user, session }) {
   const {db, loading: dbLoading, refreshDb} = useDb();
-
+  console.log(user);
   useEffect(() => {
     if (dbLoading) return;
     
@@ -160,7 +160,11 @@ export async function getServerSideProps(context) {
       id: session.user.id
     },
     include: {
-      projects: true,
+      projects: {
+        include: {
+          tasks: true
+        }
+      },
       pomodoro: true
     }
   });
