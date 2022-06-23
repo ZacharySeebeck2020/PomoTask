@@ -154,7 +154,6 @@ export async function getServerSideProps(context) {
     };
   }
   
-  
   const user = await prisma.user.findFirst({
     where: {
       id: session.user.id
