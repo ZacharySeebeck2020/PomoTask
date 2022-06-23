@@ -9,7 +9,10 @@ const nextConfig = {
   },
   pwa: {
     dest: 'public'
-  }
+  },
+  experimental: {
+    outputStandalone: true,
+  },
 };
 
 module.exports = withPWA(nextConfig);

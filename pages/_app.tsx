@@ -1,22 +1,20 @@
 import { useRouter } from 'next/router'
 import { useEffect } from 'react';
-import { app } from '../util/firebase';
 import Footer from '../components/global/footer';
 import Sidenav from '../components/global/sidenav'
 import DbProvider, { useDb } from '../context/DbProvider';
 import '../styles/globals.scss'
 import Head from 'next/head';
+import { config } from '@fortawesome/fontawesome-svg-core'
+import '@fortawesome/fontawesome-svg-core/styles.css'
+import { SessionProvider } from 'next-auth/react';
+config.autoAddCss = false
 
-function MyApp({ Component, pageProps }) {
+function MyApp({ Component, pageProps: { session, ...pageProps} }) {
   const router = useRouter();
 
-  useEffect(() => {
-    if (!app) return;
-    
-  }, [app])
-
   return (
-    <>
+    <SessionProvider session={session}>
       <Head>
         <meta name='application-name' content='PomoTask' />
         <meta name='apple-mobile-web-app-capable' content='yes' />
@@ -56,7 +54,7 @@ function MyApp({ Component, pageProps }) {
           </div>
         </section>
       </DbProvider>
-    </>
+    </SessionProvider>
   )
 }
 

@@ -14,6 +14,8 @@ import { BreakApartTime, CalculateProgress, FormatTime, GetSeconds } from '../ut
 export default function Home() {
   const {db, loading: dbLoading, refreshDb} = useDb();
 
+  console.log(db);
+
   useEffect(() => {
     if (dbLoading) return;
     
