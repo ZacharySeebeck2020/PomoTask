@@ -5,7 +5,7 @@ import prisma from "../../../lib/prisma";
 import { User } from "../../../types/db";
 import ApiErrorHandler from "../../../util/ApiErrorHandler";
 
-export default async function TaskHandler(
+export default async function UserHandler(
     req: NextApiRequest,
     res: NextApiResponse
 ) {

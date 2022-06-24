@@ -3,14 +3,18 @@ import { useEffect } from 'react';
 import Footer from '../components/global/footer';
 import Sidenav from '../components/global/sidenav'
 import DbProvider, { useDb } from '../context/DbProvider';
+import UserProvider from '../context/UserProvider';
 import '../styles/globals.scss'
 import Head from 'next/head';
 import { config } from '@fortawesome/fontawesome-svg-core'
 import '@fortawesome/fontawesome-svg-core/styles.css'
 import { getSession, SessionProvider } from 'next-auth/react';
+import { Session } from 'next-auth';
+import prisma from '../lib/prisma';
+import TimerProvider from '../context/TimerProvider';
 config.autoAddCss = false
 
-function MyApp({ Component, pageProps: { session, ...pageProps} }) {
+function MyApp({ Component, pageProps: { session, ...pageProps } }) {
   const router = useRouter();
 
   return (
@@ -45,18 +49,18 @@ function MyApp({ Component, pageProps: { session, ...pageProps} }) {
         <meta property='og:url' content='https://pomo.zacharyseebeck.com' />
         <meta property='og:image' content='https://pomo.zacharyseebeck.com/icons/icon-192x192.png' />
       </Head>
-      <DbProvider>
-        <section className={`flex min-h-screen ${router.pathname != '/login' ? 'md:ml-16' : ''}`}>
-          <Sidenav />
-          <div className="z-30 bg-background w-full text-white mt-16 md:mt-0">
-            <Component {...pageProps} />
-            {router.pathname != '/' && router.pathname != '/login' ? <Footer /> : ''}
-          </div>
-        </section>
-      </DbProvider>
+      <TimerProvider>
+        <DbProvider>
+          <section className={`flex min-h-screen ${router.pathname != '/login' ? 'md:ml-16' : ''}`}>
+            <Sidenav />
+            <div className="z-30 bg-background w-full text-white mt-16 md:mt-0">
+              <Component {...pageProps} />
+            </div>
+          </section>
+        </DbProvider>
+      </TimerProvider>
     </SessionProvider>
   )
 }
-
 
 export default MyApp

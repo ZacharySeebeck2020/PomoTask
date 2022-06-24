@@ -10,7 +10,6 @@ export function FormatTime(time: string): string {
 
 export function BreakApartTime(time: string): Time {
     const brokenTime = time.split(':');
-
     return {
         days: parseInt(brokenTime[0]),
         hours: parseInt(brokenTime[1]),
