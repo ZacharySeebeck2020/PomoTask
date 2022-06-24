@@ -23,7 +23,7 @@ export default function CustomNextAuthAdapter(client: PrismaClient, options = {}
                 }
             });
             
-            await client.project.create({
+            const createdProject = await client.project.create({
                 data: {
                     ...ProjectDefault,
                     user: {
@@ -36,6 +36,15 @@ export default function CustomNextAuthAdapter(client: PrismaClient, options = {}
                             ...TaskDefault,
                         }
                     }
+                }
+            })
+
+            await client.user.update({
+                where: {
+                    id: prismaUser.id
+                },
+                data: {
+                    activeProjectId: createdProject.id
                 }
             })
             

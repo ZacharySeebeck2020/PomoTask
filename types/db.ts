@@ -20,13 +20,22 @@ export interface Db {
 }
 
 export type User = {
-
+    id: string;
+    name: string;
+    email: string;
+    emailVerified: Date;
+    image: string;
+    projects: Array<Project>;
+    activeProjectId: string;
+    activeProject: Project;
+    pomodoro: Pomodoro;
 }
 
 export type Project = {
     id: string;
     name: string;
     timeSpent: string;
+    tasks?: Array<Task>;
 }
 
 export type Task = {
@@ -38,7 +47,7 @@ export type Task = {
 
 export type Pomodoro = {
     remainingTime: string;
-    currentStatus: PomodoroStatus;
+    currentStatus: string;
     currentSession: number;
     totalSessions: number;
     workDuration: string;
