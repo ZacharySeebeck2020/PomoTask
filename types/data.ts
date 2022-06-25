@@ -8,10 +8,9 @@ export interface DbContextValues {
     refreshDb(): void;
 }
 
-export interface TimerContextValues {
-    timer: string;
-    projectTimeSpent: string;
-    setUserObj: Dispatch<SetStateAction<User>>;
-    ResetTimer: Function;
+export interface TimerContextValues {}
 
+export interface UserContextValues {
+    userObj: User | null;
+    setUserObj: Dispatch<SetStateAction<User>>;
 }

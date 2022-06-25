@@ -4,39 +4,37 @@ import ProgressBar from "@ramonak/react-progress-bar";
 import { useEffect, useState } from "react";
 import { useDb } from "../../context/DbProvider";
 import { useTimer } from "../../context/TimerProvider";
+import { useUser } from "../../context/UserProvider";
 import { PomodoroStatus, User } from "../../types/db";
 import { PlayPauseTimer } from "../../util/Apis";
 import { BreakApartTime, CalculateProgress, FormatTime, GetSeconds } from "../../util/time";
+
 export default function Footer({ user }: { user: User }) {
-  const [ userObj, setUserObj ] = useState(user);
-  const { timer, projectTimeSpent, setUserObj: setTimerUserObj } = useTimer();
+  const { userObj, setUserObj } = useUser();
 
   useEffect(() => {
     setUserObj(user);
-  }, [user]);
+  }, []);
 
-  useEffect(() => {
-    setTimerUserObj(userObj);
-  }, [userObj]);
-
+  if ( !userObj ) return <></>
 
   return (
     <footer className="inline-flex flex-col lg:flex-row bottom-0 right-0 left-0 fixed md:left-[4em] dark:bg-gray-800 lg:h-16">
-      <span className="ml-5 lg:my-auto text-center my-2">{FormatTime(timer)}</span>
+      <span className="ml-5 lg:my-auto text-center my-2">{FormatTime(userObj.pomodoro.remainingTime)}</span>
       <div className="lg:w-4/6 my-auto px-8">
         <ProgressBar
           completed={(() => {
             switch (userObj.pomodoro.currentStatus) {
               case 'FOCUS':
-                return CalculateProgress(BreakApartTime(userObj.pomodoro.workDuration), BreakApartTime(timer));
+                return CalculateProgress(BreakApartTime(userObj.pomodoro.workDuration), BreakApartTime(userObj.pomodoro.remainingTime));
                 break;
 
               case "SHORT BREAK":
-                return CalculateProgress(BreakApartTime(userObj.pomodoro.shortBreakDuration), BreakApartTime(timer));
+                return CalculateProgress(BreakApartTime(userObj.pomodoro.shortBreakDuration), BreakApartTime(userObj.pomodoro.remainingTime));
                 break;
 
               case 'LONG BREAK':
-                return CalculateProgress(BreakApartTime(userObj.pomodoro.longBreakDuration), BreakApartTime(timer));
+                return CalculateProgress(BreakApartTime(userObj.pomodoro.longBreakDuration), BreakApartTime(userObj.pomodoro.remainingTime));
                 break;
 
               default:

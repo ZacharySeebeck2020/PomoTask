@@ -49,7 +49,8 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }) {
         <meta property='og:url' content='https://pomo.zacharyseebeck.com' />
         <meta property='og:image' content='https://pomo.zacharyseebeck.com/icons/icon-192x192.png' />
       </Head>
-      <TimerProvider>
+      <UserProvider> <TimerProvider>
+
         <DbProvider>
           <section className={`flex min-h-screen ${router.pathname != '/login' ? 'md:ml-16' : ''}`}>
             <Sidenav />
@@ -58,7 +59,8 @@ function MyApp({ Component, pageProps: { session, ...pageProps } }) {
             </div>
           </section>
         </DbProvider>
-      </TimerProvider>
+
+      </TimerProvider> </UserProvider>
     </SessionProvider>
   )
 }

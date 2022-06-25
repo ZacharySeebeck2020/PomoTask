@@ -10,22 +10,27 @@ import prisma from '../lib/prisma';
 import { Session } from 'next-auth';
 import { PlayPauseTimer, SetActiveProject, UpdateTaskComplete } from '../util/Apis';
 import { useTimer } from '../context/TimerProvider';
+import { useUser } from '../context/UserProvider';
 
 export default function Home({ user, session }: { user: User, session: Session }) {
-  const [userObj, setUserObj] = useState(user);
-  const { timer, setUserObj: setTimerUserObj, projectTimeSpent} = useTimer();
+  const { userObj, setUserObj } = useUser();
+  const {} = useTimer();
 
   useEffect(() => {
-    setTimerUserObj(userObj);
-  }, [userObj])
-  
+    setUserObj(user);
+  }, []);
+
+  useEffect(() => {}, [])
+
+  if (!userObj) return <></>
+
   return (
     <div className="w-full h-full flex flex-col sm:flex-row justify-center">
       <div className="hidden md:flex mx-auto justify-center items-center min-h-screen">
         <div className="h-auto w-96 bg-lightBlue rounded-lg p-4">
           <div className="mt-3 text-sm text-[#8ea6c8] flex justify-between items-center">
             <p className="set_date">Selected Project</p>
-            <p className="set_time">Time Spent: ({FormatTime(projectTimeSpent)})</p>
+            <p className="set_time">Time Spent: ({FormatTime(userObj.activeProject.timeSpent)})</p>
           </div>
           <p className="text-xl font-semibold mt-2 text-white">{userObj.activeProject.name}</p>
           <ul className="my-4 h-[60vh] overflow-y-auto scrollbar pr-2">
@@ -66,15 +71,15 @@ export default function Home({ user, session }: { user: User, session: Session }
             value={(() => {
               switch (userObj.pomodoro.currentStatus) {
                 case "FOCUS":
-                    return CalculateProgress( BreakApartTime(userObj.pomodoro.workDuration), BreakApartTime(timer) );
+                    return CalculateProgress( BreakApartTime(userObj.pomodoro.workDuration), BreakApartTime(userObj.pomodoro.remainingTime) );
                   break;
 
                 case "SHORT BREAK":
-                    return CalculateProgress( BreakApartTime(userObj.pomodoro.shortBreakDuration), BreakApartTime(timer) );
+                    return CalculateProgress( BreakApartTime(userObj.pomodoro.shortBreakDuration), BreakApartTime(userObj.pomodoro.remainingTime) );
                   break;
 
                 case "LONG BREAK":
-                    return CalculateProgress( BreakApartTime(userObj.pomodoro.longBreakDuration), BreakApartTime(timer) );
+                    return CalculateProgress( BreakApartTime(userObj.pomodoro.longBreakDuration), BreakApartTime(userObj.pomodoro.remainingTime) );
                   break;
               }
             })()}
@@ -107,7 +112,7 @@ export default function Home({ user, session }: { user: User, session: Session }
             })}
           >
             <div className="flex flex-col text-center">
-              <strong className="text-5xl">{FormatTime(timer)}</strong>
+              <strong className="text-5xl">{FormatTime(userObj.pomodoro.remainingTime)}</strong>
               <span className="text-2xl uppercase font-bold mt-5">{userObj.pomodoro.currentStatus}</span>
             </div>
           </CircularProgressbarWithChildren >

@@ -5,20 +5,22 @@ import { useEffect, useState } from "react";
 import Footer from "../components/global/footer";
 import { useDb } from "../context/DbProvider";
 import { useTimer } from "../context/TimerProvider";
+import { useUser } from "../context/UserProvider";
 import prisma from "../lib/prisma";
 import { Pomodoro, PomodoroStatus, User } from "../types/db";
 import { UpdatePomodoro } from "../util/Apis";
 import { BreakApartTime } from "../util/time";
 
 export default function Settings({ user, session }: { user: User, session: Session}) {
-    const [ userObj, setUserObj ] = useState<User>(user);
+    const { userObj, setUserObj } = useUser();
     const [ debounceTimeoutId, setDebounceTimeoutId ] = useState<Timeout>();
     const [ pomodoroSettings, setPomodoroSettings ] = useState(user.pomodoro);
-    const { timer, projectTimeSpent, setUserObj: setTimerUserObj, ResetTimer } = useTimer();
 
     useEffect(() => {
-        setTimerUserObj(userObj);
-    }, [userObj])
+        setUserObj(user);
+    }, []);
+
+    if (!userObj) return <></>
 
     let UpdatePomodoroValue = (name: string, value: number) => {
         setPomodoroSettings((pomodoroSettings) => {
@@ -53,7 +55,6 @@ export default function Settings({ user, session }: { user: User, session: Sessi
                         }, userObj)
                     );
 
-                    ResetTimer();
                 }, 500) 
             );   
             
