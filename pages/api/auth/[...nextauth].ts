@@ -21,8 +21,6 @@ export default NextAuth({
         }
       });
 
-      console.log('user', prismaUser);
-
       return true;
     },
     async session({ session, token, user }) {

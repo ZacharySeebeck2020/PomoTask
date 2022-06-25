@@ -16,15 +16,31 @@ const TimerProvider = ({ children }) => {
     const [timerContext, setTimerContext] = useState<TimerContextValues>({
         timer,
         projectTimeSpent,
-        setUserObj
+        setUserObj,
+        ResetTimer
     });
+    
+    function ResetTimer (userObj: User) {
+        setUserObj(userObj);
+        shouldSetTime(true);
+    }
 
+    useEffect(() => {
+        if (!userObj) return;
+
+        UpdateUser();
+
+        return () => {
+            UpdateUser();
+        }
+    }, [userObj])
 
     useEffect(() => {
         setTimerContext({
             timer,
             projectTimeSpent,
-            setUserObj
+            setUserObj,
+            ResetTimer
         });
     }, [timer, projectTimeSpent])
 
@@ -40,8 +56,8 @@ const TimerProvider = ({ children }) => {
                     seconds: 1
                 }
             );
-    
-            return TimeToString(brokenTime);            
+
+            return TimeToString(brokenTime);
         })
 
         if (userObj.pomodoro.currentStatus != 'FOCUS') return;
@@ -58,65 +74,52 @@ const TimerProvider = ({ children }) => {
                     seconds: 1
                 }
             );
-    
+
             return TimeToString(brokenTime);
         })
 
     }
 
-    function CheckTimer() {
-        if (userObj.pomodoro.remainingTime == '00:00:00:00') {
+    async function CheckTimer() {
+        let brokenTime = BreakApartTime(timer);
+        if (brokenTime.days <= 0 && brokenTime.hours <= 0 && brokenTime.minutes <= 0 && brokenTime.seconds <= 0) {
             switch (userObj.pomodoro.currentStatus) {
                 case 'FOCUS':
                     notifier.ShowNotification('Pomotask - Focus Over', 'Focus time is over, enjoy a break.')
                     if (userObj.pomodoro.currentSession == userObj.pomodoro.totalSessions) {
-                        UpdatePomodoro({
-                            ...userObj,
-                            pomodoro: {
-                                ...userObj.pomodoro,
-                                remainingTime: userObj.pomodoro.longBreakDuration,
-                                currentStatus: 'LONG BREAK',
-                                currentSession: 1,
-                                isRunning: false
-                            }
-                        });
+                        shouldSetTime(true);
+                        setUserObj(await UpdatePomodoro({
+                            remainingTime: userObj.pomodoro.longBreakDuration,
+                            currentStatus: 'LONG BREAK',
+                            currentSession: 1
+                        }, userObj));
                     } else {
-                        UpdatePomodoro({
-                            ...userObj,
-                            pomodoro: {
-                                ...userObj.pomodoro,
-                                remainingTime: userObj.pomodoro.shortBreakDuration,
-                                currentStatus: 'SHORT BREAK',
-                                currentSession: userObj.pomodoro.currentSession + 1,
-                                isRunning: false
-                            }
-                        });
-
+                        shouldSetTime(true);
+                        setUserObj(await UpdatePomodoro({
+                            ...userObj.pomodoro,
+                            remainingTime: userObj.pomodoro.shortBreakDuration,
+                            currentStatus: 'SHORT BREAK',
+                            currentSession: userObj.pomodoro.currentSession + 1
+                        }, userObj));
                     }
                     break;
                 case 'SHORT BREAK':
+                    shouldSetTime(true);
                     notifier.ShowNotification('Pomotask - Break Over', 'Break time is over, time to get back to work.')
-                    UpdatePomodoro({
-                        ...userObj,
-                        pomodoro: {
-                            ...userObj.pomodoro,
-                            remainingTime: userObj.pomodoro.workDuration,
-                            currentStatus: 'FOCUS',
-                            isRunning: false
-                        }
-                    });
+                    setUserObj(await UpdatePomodoro({
+                        ...userObj.pomodoro,
+                        remainingTime: userObj.pomodoro.workDuration,
+                        currentStatus: 'FOCUS'
+                    }, userObj));
                     break;
                 case 'LONG BREAK':
+                    shouldSetTime(true);
                     notifier.ShowNotification('Pomotask - Break Over', 'Break time is over, time to get back to work.')
-                    UpdatePomodoro({
-                        ...userObj,
-                        pomodoro: {
-                            ...userObj.pomodoro,
-                            remainingTime: userObj.pomodoro.workDuration,
-                            currentStatus: 'FOCUS',
-                            isRunning: false
-                        }
-                    })
+                    setUserObj(await UpdatePomodoro({
+                        ...userObj.pomodoro,
+                        remainingTime: userObj.pomodoro.workDuration,
+                        currentStatus: 'FOCUS'
+                    }, userObj))
                     break;
             }
             return;
@@ -124,17 +127,23 @@ const TimerProvider = ({ children }) => {
     }
 
     function UpdateUser() {
-        UpdatePomodoro({
-            ...userObj,
-            pomodoro: {
-                ...userObj.pomodoro,
-                remainingTime: timer
-            }
+        setTimer((timer) => {
+            
+            UpdatePomodoro({
+                remainingTime: timer ? timer : userObj.pomodoro.remainingTime,
+            }, userObj);
+
+            return timer;
         });
 
-        UpdateProject(userObj.activeProject.id, {
-            timeSpent: projectTimeSpent
-        }, userObj);
+        setProjectTimeSpent((projectTimeSpent) => {
+            UpdateProject(userObj.activeProject.id, {
+                timeSpent: projectTimeSpent
+            }, userObj);
+
+            return projectTimeSpent;
+        });
+
     }
 
     useEffect(() => {
@@ -147,19 +156,20 @@ const TimerProvider = ({ children }) => {
         }
 
         if (userObj.pomodoro.isRunning) {
-            const checkingIntervalId = setInterval(() => CheckTimer(), 1000);
-            const timerIntervalId = setInterval(() => RunTimer(), 1000);
-            const updateUserIntervalId = setInterval(() => UpdateUser(), 10000);
+            const checkingIntervalId = setInterval(CheckTimer.bind(this), 1000);
+            const timerIntervalId = setInterval(RunTimer, 1000);
+            const updateUserIntervalId = setInterval(UpdateUser, 30000);
 
             return () => {
                 clearInterval(timerIntervalId);
                 clearInterval(checkingIntervalId);
                 clearInterval(updateUserIntervalId);
-                UpdateUser();
             }
+        } else {
+            // setTimer(userObj.pomodoro.remainingTime);
         }
 
-    }, [userObj]);
+    });
 
     return (
         <TimerContext.Provider value={timerContext}>

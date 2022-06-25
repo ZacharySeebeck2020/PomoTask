@@ -1,5 +1,5 @@
 import { PomodoroApiResponse, ProjectApiResponse, TaskApiResponse, UserApiResponse } from "../types/api";
-import { Project, Task, User } from "../types/db";
+import { Pomodoro, Project, Task, User } from "../types/db";
 
 export async function UpdateTaskComplete(taskId: string, isComplete: boolean, userObj: User) {
     let tmpUserObj: User = { ...userObj };
@@ -90,11 +90,11 @@ export async function PlayPauseTimer(userObj: User) {
 
     if (res.status == 200) tmpUserObj.pomodoro = jsonResponse.pomodoro;
     else console.log(jsonResponse.message);
-
+    
     return tmpUserObj
 }
 
-export async function UpdatePomodoro(userObj: User) {
+export async function UpdatePomodoro(pomodoro: Partial<Pomodoro>, userObj: User) {
     let tmpUserObj: User = { ...userObj };
 
     let res = await fetch(`/api/pomodoro/`, {
@@ -102,9 +102,7 @@ export async function UpdatePomodoro(userObj: User) {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-            ...tmpUserObj.pomodoro
-        })
+        body: JSON.stringify(pomodoro)
     });
 
     const jsonResponse: PomodoroApiResponse = await res.json();

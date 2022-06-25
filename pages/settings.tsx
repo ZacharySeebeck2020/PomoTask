@@ -1,52 +1,77 @@
 import { doesNotMatch } from "assert";
+import { Session } from "next-auth";
 import { getSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 import Footer from "../components/global/footer";
 import { useDb } from "../context/DbProvider";
-import { Pomodoro, PomodoroStatus } from "../types/db";
+import { useTimer } from "../context/TimerProvider";
+import prisma from "../lib/prisma";
+import { Pomodoro, PomodoroStatus, User } from "../types/db";
+import { UpdatePomodoro } from "../util/Apis";
 import { BreakApartTime } from "../util/time";
 
-export default function Settings() {
-    const {db, loading: dbLoading, refreshDb} = useDb();
+export default function Settings({ user, session }: { user: User, session: Session}) {
+    const [ userObj, setUserObj ] = useState<User>(user);
+    const [ debounceTimeoutId, setDebounceTimeoutId ] = useState<Timeout>();
+    const [ pomodoroSettings, setPomodoroSettings ] = useState(user.pomodoro);
+    const { timer, projectTimeSpent, setUserObj: setTimerUserObj, ResetTimer } = useTimer();
+
+    useEffect(() => {
+        setTimerUserObj(userObj);
+    }, [userObj])
 
     let UpdatePomodoroValue = (name: string, value: number) => {
-        let updatedPomodoro: Pomodoro = db.pomodoro;
-        switch (name) {
-            case 'workDuration':
-                    updatedPomodoro.workDuration = `00:00:${value}:00`;
-                break;
-            case 'shortBreakDuration':
-                updatedPomodoro.shortBreakDuration = `00:00:${value}:00`;
-                break;
-            case 'longBreakDuration':
-                updatedPomodoro.longBreakDuration = `00:00:${value}:00`;
-                break;
-            case 'totalSessions':
-                updatedPomodoro.totalSessions = value;
-                break;
-        }
-        db.UpdatePomodoro({
-            ...updatedPomodoro,
-            remainingTime: updatedPomodoro.workDuration,
-            currentStatus: PomodoroStatus.FOCUS,
-            currentSession: 1,
-            isRunning: false
+        setPomodoroSettings((pomodoroSettings) => {
+            switch (name) {
+                case 'workDuration':
+                        pomodoroSettings.workDuration = `00:00:${value}:00`;
+                    break;
+                case 'shortBreakDuration':
+                    pomodoroSettings.shortBreakDuration = `00:00:${value}:00`;
+                    break;
+                case 'longBreakDuration':
+                    pomodoroSettings.longBreakDuration = `00:00:${value}:00`;
+                    break;
+                case 'totalSessions':
+                    pomodoroSettings.totalSessions = value;
+                    break;
+            }
+
+            if (debounceTimeoutId) {
+                clearTimeout(debounceTimeoutId);
+            }
+
+            setDebounceTimeoutId( 
+                setTimeout(async () => {
+                    setUserObj(
+                        await UpdatePomodoro({
+                            ...pomodoroSettings,
+                            remainingTime: pomodoroSettings.workDuration,
+                            currentStatus: 'FOCUS',
+                            currentSession: 1,
+                            isRunning: false
+                        }, userObj)
+                    );
+
+                    ResetTimer();
+                }, 500) 
+            );   
+            
+            return pomodoroSettings;
         })
-        refreshDb();
     }
 
-    if (dbLoading) {
-        return <h1>Loading...</h1>
-    }
 
     return (
         <>
             <div className="w-3/6 mx-auto h-full flex flex-col -mt-16 justify-center mb-16">
+                <h1 className="text-center text-sm mb-5 text-gray-500">Changing Settings Will Reset The Timer</h1>
                 <div>
                     <label className="label">
                         <span className="label-text">Work Duration</span>
-                        <span className="label-text-alt">{BreakApartTime(db.pomodoro.workDuration).minutes} Minutes</span>
+                        <span className="label-text-alt">{BreakApartTime(pomodoroSettings.workDuration).minutes} Minutes</span>
                     </label>
-                    <input type="range" min="5" max="60" value={BreakApartTime(db.pomodoro.workDuration).minutes} onChange={(evt) => {UpdatePomodoroValue('workDuration', parseInt(evt.target.value))}} className="range range-xs" step="5"/>
+                    <input type="range" min="5" max="60" value={BreakApartTime(pomodoroSettings.workDuration).minutes} onChange={(evt) => {UpdatePomodoroValue('workDuration', parseInt(evt.target.value))}} className="range range-xs" step="5"/>
                     <div className="w-full flex justify-between text-xs px-2">
                         {(() => {
                             let elements = [];
@@ -64,9 +89,9 @@ export default function Settings() {
                 <div className="mt-3">
                     <label className="label">
                         <span className="label-text">Short Break</span>
-                        <span className="label-text-alt">{BreakApartTime(db.pomodoro.shortBreakDuration).minutes} Minutes</span>
+                        <span className="label-text-alt">{BreakApartTime(pomodoroSettings.shortBreakDuration).minutes} Minutes</span>
                     </label>
-                    <input type="range" min="1" value={BreakApartTime(db.pomodoro.shortBreakDuration).minutes} onChange={(evt) => {UpdatePomodoroValue('shortBreakDuration', parseInt(evt.target.value))}} max="30" className="range range-xs" step="1"/>
+                    <input type="range" min="1" value={BreakApartTime(pomodoroSettings.shortBreakDuration).minutes} onChange={(evt) => {UpdatePomodoroValue('shortBreakDuration', parseInt(evt.target.value))}} max="30" className="range range-xs" step="1"/>
                     <div className="w-full flex justify-between text-xs px-2">
                         {(() => {
                             let elements = [];
@@ -84,9 +109,9 @@ export default function Settings() {
                 <div className="mt-3">
                     <label className="label">
                         <span className="label-text">Long Break</span>
-                        <span className="label-text-alt">{BreakApartTime(db.pomodoro.longBreakDuration).minutes} Minutes</span>
+                        <span className="label-text-alt">{BreakApartTime(pomodoroSettings.longBreakDuration).minutes} Minutes</span>
                     </label>
-                    <input type="range" min="1" max="45" value={BreakApartTime(db.pomodoro.longBreakDuration).minutes} onChange={(evt) => {UpdatePomodoroValue('longBreakDuration', parseInt(evt.target.value))}} className="range range-xs" step="1"/>
+                    <input type="range" min="1" max="45" value={BreakApartTime(pomodoroSettings.longBreakDuration).minutes} onChange={(evt) => {UpdatePomodoroValue('longBreakDuration', parseInt(evt.target.value))}} className="range range-xs" step="1"/>
                     <div className="w-full flex justify-between text-xs px-2">
                         {(() => {
                             let elements = [];
@@ -104,9 +129,9 @@ export default function Settings() {
                 <div className="mt-3">
                     <label className="label">
                         <span className="label-text">Sessions</span>
-                        <span className="label-text-alt">{db.pomodoro.totalSessions} Sessions</span>
+                        <span className="label-text-alt">{pomodoroSettings.totalSessions} Sessions</span>
                     </label>
-                    <input type="range" min="2" value={db.pomodoro.totalSessions} onChange={(evt) => {UpdatePomodoroValue('totalSessions', parseInt(evt.target.value))}} max="15" className="range range-xs" step="1"/>
+                    <input type="range" min="2" value={pomodoroSettings.totalSessions} onChange={(evt) => {UpdatePomodoroValue('totalSessions', parseInt(evt.target.value))}} max="15" className="range range-xs" step="1"/>
                     <div className="w-full flex justify-between text-xs px-2">
                         {(() => {
                             let elements = [];
@@ -121,24 +146,47 @@ export default function Settings() {
                     </div>
                 </div>
             </div>
-            <Footer/>
+            <Footer user={userObj} />
         </>
     )
 }
 
 export async function getServerSideProps(context) {
-  const session = await getSession(context);
-
-  if (!session) {
-    return {
-      redirect: {
-        destination: '/login',
-        permanent: false,
+    const session: Session = await getSession(context);
+  
+    if (!session) {
+      return {
+        redirect: {
+          destination: '/login',
+          permanent: false,
+        }
+      };
+    }
+  
+    const user = await prisma.user.findFirst({
+      where: {
+        id: session.user.id
+      },
+      include: {
+        projects: {
+          include: {
+            tasks: true
+          }
+        },
+        activeProject: {
+          include: {
+            tasks: true
+          }
+        },
+        pomodoro: true
       }
-    };
+    });
+  
+    return {
+      props: {
+        user: user,
+        session: session,
+      }
+    }
   }
-
-  return {
-    props: {}
-  }
-}
+  

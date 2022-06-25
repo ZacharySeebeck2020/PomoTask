@@ -12,5 +12,6 @@ export interface TimerContextValues {
     timer: string;
     projectTimeSpent: string;
     setUserObj: Dispatch<SetStateAction<User>>;
+    ResetTimer: Function;
 
 }
