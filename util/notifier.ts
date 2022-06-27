@@ -18,7 +18,6 @@ class Notifier {
             body,
             icon: '/icon.png'
         });
-        console.log(t);
     }
 
     HasPermission(): boolean {
