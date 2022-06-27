@@ -14,6 +14,7 @@ const TimerProvider = ({ children }) => {
     const [ shouldUpdateUser, setShouldUpdateUser ] = useState(true);
 
     function RunTimer() {
+        console.log('timer');
         let pomodoroBrokenTime = BreakApartTime(userObj.pomodoro.remainingTime);
         pomodoroBrokenTime = SubtractByTime(
             pomodoroBrokenTime,
@@ -114,9 +115,16 @@ const TimerProvider = ({ children }) => {
             remainingTime: userObj.pomodoro.remainingTime,
         }, userObj);
 
-        setUserObj(await UpdateProject(userObj.activeProject.id, {
-            timeSpent: userObj.activeProject.timeSpent
-        }, userObj));
+        if (!userObj.pomodoro.isRunning) {
+            setUserObj(await UpdateProject(userObj.activeProject.id, {
+                timeSpent: userObj.activeProject.timeSpent
+            }, userObj));
+        } else {
+            await UpdateProject(userObj.activeProject.id, {
+                timeSpent: userObj.activeProject.timeSpent
+            }, userObj);
+        }
+
 
         setShouldUpdateUser(false);
         setTimeout(() => {

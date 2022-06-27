@@ -9,12 +9,8 @@ import { PomodoroStatus, User } from "../../types/db";
 import { PlayPauseTimer } from "../../util/Apis";
 import { BreakApartTime, CalculateProgress, FormatTime, GetSeconds } from "../../util/time";
 
-export default function Footer({ user }: { user: User }) {
+export default function Footer() {
   const { userObj, setUserObj } = useUser();
-
-  useEffect(() => {
-    setUserObj(user);
-  }, []);
 
   if ( !userObj ) return <></>
 

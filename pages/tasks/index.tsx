@@ -1,12 +1,18 @@
 import { faCheck, faPencil, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Session } from "next-auth";
 import { getSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import Footer from "../../components/global/footer";
 import { useDb } from "../../context/DbProvider";
+import { useUser } from "../../context/UserProvider";
+import prisma from "../../lib/prisma";
+import { User } from "../../types/db";
 
-export default function Index() {
-    const {db, loading: dbLoading, refreshDb} = useDb();
+export default function Index({ user, session }: { user: User, session: Session}) {
+    const { userObj, setUserObj } = useUser();
+
+    const { db, loading: dbLoading, refreshDb } = useDb();
     const [activeProject, setActiveProject] = useState(0);
     const [newTaskString, setNewTaskString] = useState<string>('');
     const [projectTitle, setProjectTitle] = useState<string>('');
@@ -17,6 +23,12 @@ export default function Index() {
             setProjectTitle(activeProject == -1 ? '' : db.projects[activeProject].name);
         }
     }, [activeProject, db, dbLoading])
+
+    useEffect(() => {
+        setUserObj(user);
+    }, []);
+
+    if (!userObj) return <></>   
 
     if (dbLoading) {
         return <h1>Loading...</h1>
@@ -32,11 +44,11 @@ export default function Index() {
                                 <li key={`projSelector${idx}`} className="mr-2">
                                     <a href="#" className={
                                         'inline-block p-4 rounded-t-lg border-b-2 ' +
-                                        (activeProject == idx ? 
+                                        (activeProject == idx ?
                                             'text-blue-500 border-blue-500' :
                                             'border-transparent hover:text-gray-600 hover:text-gray-300'
                                         )
-                                    } onClick={() => {setActiveProject(idx); refreshDb();}} aria-current="page">{project.name}</a>
+                                    } onClick={() => { setActiveProject(idx); refreshDb(); }} aria-current="page">{project.name}</a>
                                 </li>
                             );
                         })}
@@ -48,7 +60,7 @@ export default function Index() {
                                 setIsEditingProject(true);
                             }} className={
                                 'inline-block p-4 rounded-t-lg border-b-2 ' +
-                                (activeProject == -1 ? 
+                                (activeProject == -1 ?
                                     'text-blue-500 border-blue-500' :
                                     'border-transparent hover:text-gray-600 hover:text-gray-300'
                                 )
@@ -60,18 +72,18 @@ export default function Index() {
                 <div className="flex flex-row mb-4 mx-4 md:mx-16">
                     {isEditingProject ? (
                         <div className="w-full flex flex-row">
-                            <input value={projectTitle} onChange={(event) => {setProjectTitle(event.target.value)}} className="input w-full mr-4"/>
+                            <input value={projectTitle} onChange={(event) => { setProjectTitle(event.target.value) }} className="input w-full mr-4" />
                             <button className="btn btn-success ml-auto" onClick={() => {
                                 if (projectTitle == '') {
                                     alert('Must have project title!');
                                     return;
-                                } 
+                                }
                                 if (activeProject != -1) {
-                                    db.UpdateProject(db.projects[activeProject].id, {...db.projects[activeProject], name: projectTitle});
+                                    db.UpdateProject(db.projects[activeProject].id, { ...db.projects[activeProject], name: projectTitle });
                                     refreshDb();
                                     setIsEditingProject(false);
                                 } else {
-                                    db.CreateProject({name: projectTitle});
+                                    db.CreateProject({ name: projectTitle });
                                     refreshDb();
                                     setActiveProject(db.projects.length - 1);
                                     refreshDb();
@@ -88,7 +100,7 @@ export default function Index() {
                                 }
                             }}>Cancel</button>
                             <FontAwesomeIcon className="text-sm my-auto mr-4 cursor-pointer ml-4" icon={faTrash} onClick={() => {
-                                if(!confirm('Are you sure you want to delete this project?')) {
+                                if (!confirm('Are you sure you want to delete this project?')) {
                                     return;
                                 }
 
@@ -105,7 +117,7 @@ export default function Index() {
                         </div>
                     ) : (
                         <h2 className="text-xl flex flex-row">
-                            <FontAwesomeIcon className="text-sm my-auto mr-4 cursor-pointer" icon={faPencil} onClick={() => {setIsEditingProject(true)}} /> {db.projects[activeProject].name}
+                            <FontAwesomeIcon className="text-sm my-auto mr-4 cursor-pointer" icon={faPencil} onClick={() => { setIsEditingProject(true) }} /> {db.projects[activeProject].name}
                         </h2>
                     )}
                 </div>
@@ -118,16 +130,16 @@ export default function Index() {
                                 <li className=" mt-4" id="1">
                                     <div className="flex gap-2">
                                         <div className="w-full h-12 bg-[#e0ebff] rounded-[7px] flex justify-start items-center px-3">
-                                            <input value={newTaskString} onChange={(event) => {setNewTaskString(event.target.value)}} className="input h-10 text-white w-full mr-6" placeholder="Add New Task"></input>
-                                            <span 
+                                            <input value={newTaskString} onChange={(event) => { setNewTaskString(event.target.value) }} className="input h-10 text-white w-full mr-6" placeholder="Add New Task"></input>
+                                            <span
                                                 onClick={() => {
                                                     db.CreateTask(db.projects[activeProject].id, {
                                                         value: newTaskString
                                                     });
                                                     refreshDb();
                                                     setNewTaskString('');
-                                                }} 
-                                                id="check1" 
+                                                }}
+                                                id="check1"
                                                 className="ml-auto bg-green-500 w-9 h-7 rounded-full border border-white transition-all cursor-pointer hover:border-[#36d344] flex justify-center items-center"
                                             >
                                                 <FontAwesomeIcon className="text-white" icon={faPlus} />
@@ -137,19 +149,19 @@ export default function Index() {
                                 </li>
                                 <li className="mt-4" id="1">
                                     <div className="flex gap-2 flex-col-reverse">
-                                            {activeProject != -1 ? db.GetProjectTasks(db.projects[activeProject].id).map((task) => {
-                                                return (
-                                                    <div key={`tasksProj${db.projects[activeProject].id}Task${task.id}`} className="w-full h-12 bg-[#e0ebff] rounded-[7px] flex justify-start items-center px-3">
-                                                        <span onClick={() => {
-                                                            db.UpdateTask(task.id, {...task, completed: !task.completed});
-                                                            refreshDb();
-                                                        }} className={`${task.completed ? 'bg-green-500' : 'bg-white' } w-7 h-7 rounded-full border border-white transition-all cursor-pointer hover:border-[#36d344] flex justify-center items-center`}>
-                                                            <FontAwesomeIcon className="text-white" icon={faCheck} />
-                                                        </span>
-                                                        <span className={`${task.completed ? 'line-through' : '' } text-sm ml-4 text-[#5b7a9d] font-semibold`}>{task.value}</span>
-                                                    </div>
-                                                )
-                                            }) : (<></>)}
+                                        {activeProject != -1 ? db.GetProjectTasks(db.projects[activeProject].id).map((task) => {
+                                            return (
+                                                <div key={`tasksProj${db.projects[activeProject].id}Task${task.id}`} className="w-full h-12 bg-[#e0ebff] rounded-[7px] flex justify-start items-center px-3">
+                                                    <span onClick={() => {
+                                                        db.UpdateTask(task.id, { ...task, completed: !task.completed });
+                                                        refreshDb();
+                                                    }} className={`${task.completed ? 'bg-green-500' : 'bg-white'} w-7 h-7 rounded-full border border-white transition-all cursor-pointer hover:border-[#36d344] flex justify-center items-center`}>
+                                                        <FontAwesomeIcon className="text-white" icon={faCheck} />
+                                                    </span>
+                                                    <span className={`${task.completed ? 'line-through' : ''} text-sm ml-4 text-[#5b7a9d] font-semibold`}>{task.value}</span>
+                                                </div>
+                                            )
+                                        }) : (<></>)}
                                     </div>
                                 </li>
                             </ul>
@@ -158,32 +170,52 @@ export default function Index() {
 
                     <div className="flex flex-col w-4/6 mr-16">
                         <div>
-                            
+
                         </div>
                     </div>
                 </div>
 
             </div>
-            <Footer/>
+            <Footer />
         </>
     )
 }
 
 export async function getServerSideProps(context) {
-  const session = await getSession(context);
+    const session: Session = await getSession(context);
 
-  console.log('session', session);
+    if (!session) {
+        return {
+            redirect: {
+                destination: '/login',
+                permanent: false,
+            }
+        };
+    }
 
-  if (!session) {
+    const user = await prisma.user.findFirst({
+        where: {
+            id: session.user.id
+        },
+        include: {
+            projects: {
+                include: {
+                    tasks: true
+                }
+            },
+            activeProject: {
+                include: {
+                    tasks: true
+                }
+            },
+            pomodoro: true
+        }
+    });
+
     return {
-      redirect: {
-        destination: '/login',
-        permanent: false,
-      }
-    };
-  }
-
-  return {
-    props: {}
-  }
+        props: {
+            user: user,
+            session: session,
+        }
+    }
 }
